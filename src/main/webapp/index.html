@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Package Delivery Management System</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--===============================================================================================-->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <link rel="stylesheet" type="text/css" href="css/home.css" />
+    <!--===============================================================================================-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function() {
+	$("#context").hide();
+	$("#addpkg").hide();
+	var api = "http://localhost:8055/PDMS/webapi/Students/getAll";
+	var dataList = document.getElementById('names');
+  	$.get(api , function(data, status){
+			data.forEach(function(item){
+				var option = document.createElement('option');
+		        option.value = item.name;
+		        option.id = item.id;
+		        dataList.appendChild(option);
+			});		
+	});  	
+  });
+  function showDetails(){
+	  var optionSelected = $("#search").val();
+	  stud_id = $('#names').find('option[value="' +optionSelected+ '"]').attr('id');
+	  var api = "http://localhost:8055/PDMS/webapi/Students/get/"+stud_id;
+	  $.get(api , function(data, status){
+		  data.forEach(function(item){
+			document.getElementById("name").defaultValue = item.name;
+			document.getElementById("email").defaultValue = item.emailid;
+			document.getElementById("roll").defaultValue = item.rollno;
+		  });
+	  });
+	  api = "http://localhost:8055/PDMS/webapi/Packages/getAll/"+stud_id;
+	  $.get(api , function(data, status){
+		    $("#status").empty();
+		    var row = "";
+			data.forEach(function(item){
+				row += "<tr><td>" + item.pkg_id + "</td><td>" + item.collect_status + "</td><td>" + item.pkg_entry_time + "</td><td>" + item.pkg_collect_time + "</td><td>" + item.provider_name  + "</td><td>" + item.storeroom_status  + "</td><td>" + item.reciever_name  + "</td></tr>";
+	            $(row).appendTo("#status");
+			});		
+	  });
+	  $("#context").show();
+  }
+  function addPackage(){
+	  $("#addpkg").toggle();
+  }
+  $("#addpkg").submit(function(eventObj) {
+	    var time = new Date().toString();
+	    $(this).append('<input type="hidden" name="entry_time" value='+ time +'" /> ');
+	    //var form = 
+	}); 
+  </script>
+  </head>
+  <body class="bg">
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <ul class="nav navbar-nav">
+            <li>
+              <a class="navbar-brand active" href="#">Package Delivery Management System</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div id="packageDeliverySystem">
+        <!-- Search form -->
+        <h3>Search for Users</h3>
+        <div class="row">
+          <div class="col-md-6">
+            <input class="form-control" type="text" placeholder="Search" list="names" id="search"/>
+            <br />
+          </div>
+          <div class="col-md-6">
+            <button type="button" class="btn btn-primary" onclick="showDetails();">Search</button>
+          </div>
+        </div>
+        
+        <datalist id="names">
+        </datalist>
+		<div id="context">
+	        <h3>Add a new Package</h3>
+	  		<a href="#" id="addPackage" onclick="addPackage();">
+	          <span class="glyphicon glyphicon-plus-sign"></span>
+	        </a>
+	        <form id="addpkg" class="form-inline">
+	          <div class="form-group">
+			    <label for="name">Student Name:</label>
+			    <input type="text" class="form-control" id="name" readonly>
+			  </div>
+	          <div class="form-group">
+			    <label for="email">&emsp;Email address:</label>
+			    <input type="email" class="form-control" id="email" readonly>
+			  </div>
+			  <div class="form-group">
+			    <label for="roll">&emsp; Roll No:</label>
+			    <input type="text" class="form-control" id="roll" readonly>
+			  </div>
+			  <br>
+			  <br>
+			  <div class="form-group">
+			    <label for="pkgid">Package Id:</label>
+			    <input type="text" class="form-control" id="pkgid">
+			  </div>
+	          <div class="form-group">
+			    <label for="pkgpdr">&emsp; Package Provider:</label>
+			    <input type="text" class="form-control" id="pkgpdr">
+			  </div>
+			  <br>
+			  <br>
+			  <button type="submit" class="btn btn-primary">Submit</button>
+	        </form>
+	        <br />
+	        <br />
+	
+	        <div class="table-responsive">
+	          <table class="table">
+	            <thead>
+	              <tr>
+	                <th>Package ID</th>
+	                <th>Collection Status</th>
+	                <th>Entry Time</th>
+	                <th>Collected Time</th>
+	                <th>Provider Name</th>
+	                <th>Store Room Status</th>
+	                <th>Reciever Name</th>
+	              </tr>
+	            </thead>
+	            <tbody id="status">
+	            </tbody>
+	          </table>
+	        </div>
+        </div>
+      </div>
+    </div>
+    <!--===============================================================================================-->
+  </body>
+</html>
